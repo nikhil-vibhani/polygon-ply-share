@@ -24,7 +24,7 @@ export const StakeModal = (props) => {
                 <div class="custom_range">
                     <div class="fs-16px">Stake Baked Tokens</div>
                     <InputGroup className="mb-3">
-                        <input type="number" min="25000" max={props.balance} value={getBund} disabled class="form-control" />
+                        <input type="number" min="25000" max={props.balance} value={getBund} onChange={(e) => setBund(e.target.value)} class="form-control" />
                         {/* <InputGroup.Text>40%</InputGroup.Text> */}
                     </InputGroup>
                     <input type="range" min="25000" max={props.balance} value={getBund} onChange={(e) => setBund(e.target.value)} className="w-100" />
