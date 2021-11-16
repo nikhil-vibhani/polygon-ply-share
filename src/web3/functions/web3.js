@@ -35,7 +35,6 @@ const loadBlockChainData = async (
         // listen the Chain ID
         const chainId = '137';
         const chainData = chainId ? getChainData(chainId) : null;
-        console.log('chainDatadddddddddd', chainData);
         if (chainData && chainData.isChainValid) {
             // Load Account
             const accounts = await web3.eth.getAccounts();
