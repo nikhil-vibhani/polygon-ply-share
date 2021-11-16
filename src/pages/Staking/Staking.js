@@ -194,7 +194,7 @@ const Staking = () => {
                             <Col xs={7} className="text-right fs-xxl-20px fs-18px fw-600 text-white">25000 BAKED</Col>
                         </Row>
                         <Row className="align-items-center py-1">
-                            <Col xs={5} className="fs-xxl-16px fs-14px text-white opacity-70 ">Loking Period</Col>
+                            <Col xs={5} className="fs-xxl-16px fs-14px text-white opacity-70 ">Locking Period</Col>
                             <Col xs={7} className="text-right fs-xxl-20px fs-18px fw-600 text-white">{duration}</Col>
                         </Row>
                         {/* {getLoadingStackBtn !== 'unstack' && parseInt(stackCount) > 0 && <Button variant="stake" className="w-100 mt-3" disabled={isLoading} onClick={() => onClickToStack('unstack')}><span>Unstake</span></Button>} */}
