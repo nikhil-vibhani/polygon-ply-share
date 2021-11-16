@@ -133,6 +133,7 @@ function unstack(ercInstance, walletAddress, amount, stakeId) {
 function whiteListed(ercInstance, walletAddress, stakeId) {
     return new Promise(async (resolve, reject) => {
         try {
+            
             return await ercInstance.methods
                 .whiteListed(parseInt(stakeId))
                 .send({ from: walletAddress })
@@ -172,12 +173,12 @@ function getBackedBalance(ercInstance, walletAddress, stakeId) {
     return new Promise(async (resolve, reject) => {
         try {
             return await ercInstance.methods
-                .balanceOf('0x01b424B9A90a6C31fc0919d76D5b2e196D06c40b')
-                .call({ from: '0x01b424B9A90a6C31fc0919d76D5b2e196D06c40b' }, (err, data) => {
+                .balanceOf(walletAddress)
+                .call({ from: walletAddress }, (err, data) => {
                     if (err) {
+                        
                         reject({ error: err});
                     } else {
-                        console.log('data', data)
                         resolve(data/enviornment.divideValue)
                     }
                 });
