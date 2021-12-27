@@ -3,7 +3,7 @@ import { Button, InputGroup, Modal } from 'react-bootstrap'
 import { ToastContainer, toast } from 'react-toastify'
 
 export const StakeModal = (props) => {
-    const [getBund, setBund] = useState(35000)
+    const [getBund, setBund] = useState(25000)
     const onClickToBund = (e) => {
         e.preventDefault()
         if(getBund) {
