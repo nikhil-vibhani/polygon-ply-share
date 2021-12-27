@@ -30,7 +30,6 @@ function getBackedInstance(web3) {
     
     return new Promise(async (resolve, reject) => {
         if (web3 && web3 != '') {
-            console.log('dd')
             try {
                 let Instance = await new web3.eth.Contract(
                     enviornment.BACKEDABI,
@@ -91,6 +90,8 @@ function approve(ercInstance, walletAddress, data) {
         }
     });
 }
+
+
 
 function stack(ercInstance, walletAddress, uId, amount) {
     return new Promise(async (resolve, reject) => {
@@ -169,6 +170,25 @@ function AllStakes(ercInstance, walletAddress) {
     });
 }
 
+function iswhitelisted(ercInstance, walletAddress, stakeId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            return await ercInstance.methods
+                .iswhitelisted(stakeId)
+                .call({ from: walletAddress }, (err, data) => {
+                    if (err) {
+                        reject({ error: err});
+                    } else {
+                        resolve(data)
+                    }
+                });
+        } catch (error) {
+            console.log("error11", error)
+            reject(error);
+        }
+    });
+}
+
 function getBackedBalance(ercInstance, walletAddress, stakeId) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -195,8 +215,10 @@ function getBackedDuration(ercInstance, walletAddress, stakeId) {
                 .duration()
                 .call({ from: walletAddress }, (err, data) => {
                     if (err) {
+                        console.log('error',err)
                         reject({ error: err});
                     } else {
+                        console.log('data',data)
                         resolve(data)
                     }
                 });
@@ -237,5 +259,6 @@ export const poolMethods = {
     AllStakes,
     getStakes,
     getBackedBalance,
-    getBackedDuration
+    getBackedDuration,
+    iswhitelisted
 }

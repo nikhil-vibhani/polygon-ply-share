@@ -9,6 +9,7 @@ import { Web3Context } from '../../web3/contexts/web3Context'
 import { poolMethods } from '../../web3/functions/factory'
 import { ToastContainer, toast } from 'react-toastify'
 import { StakeModal } from './StakeModal';
+import { addStake } from '../../action/stake.action'
 import {getWalletDetails, updateContract} from '../../action/stake.action'
 import {dayHourMinuteFormate} from '../../utils/utils'
 
@@ -119,7 +120,7 @@ const Staking = () => {
             }
         }
     }
-
+    
     const onClickToStackPay = async (amount) => {
         if(parseInt(amount) <= bakedBalance) {
             setShowStake(false)
@@ -128,7 +129,15 @@ const Staking = () => {
                 try {
                     var timestamp = Date.parse(new Date())
                     const result = await poolMethods.stack(getInstancePrev, networkDetails.address, timestamp, amount)
+                    // const result1 = await poolMethods.AllStakes(getInstancePrev, networkDetails.address)
+                    // const stakeId = await result1[result1.length - 1]
+                    // console.log('result1[result1.lenght - 1]', result1[result1.length - 1], result1)
+                    // const obj = {
+                    //     walletAddress: networkDetails.address,
+                    //     stakeId
+                    // }
                     if (result) {
+                        // await addStake(obj);
                         getPoolAmount()
                         setStackCount(parseInt(stackCount) + 1)
                         localStorage.setItem("stackCount", parseInt(stackCount) + 1);
@@ -194,7 +203,7 @@ const Staking = () => {
                             <Col xs={7} className="text-right fs-xxl-20px fs-18px fw-600 text-white">25000 BAKED</Col>
                         </Row>
                         <Row className="align-items-center py-1">
-                            <Col xs={5} className="fs-xxl-16px fs-14px text-white opacity-70 ">Loking Period</Col>
+                            <Col xs={5} className="fs-xxl-16px fs-14px text-white opacity-70 ">Locking Period</Col>
                             <Col xs={7} className="text-right fs-xxl-20px fs-18px fw-600 text-white">{duration}</Col>
                         </Row>
                         {/* {getLoadingStackBtn !== 'unstack' && parseInt(stackCount) > 0 && <Button variant="stake" className="w-100 mt-3" disabled={isLoading} onClick={() => onClickToStack('unstack')}><span>Unstake</span></Button>} */}

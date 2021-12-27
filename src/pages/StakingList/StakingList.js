@@ -9,6 +9,7 @@ import { Web3Context } from '../../web3/contexts/web3Context'
 import { poolMethods } from '../../web3/functions/factory'
 import { ToastContainer, toast } from 'react-toastify'
 import {formattedDate, dateFormate} from '../../utils/utils'
+import { getAllStake } from '../../action/stake.action'
 
 const StakingList = () => {
     
@@ -17,6 +18,7 @@ const StakingList = () => {
     const [getInstance, setInstance] = useState();
     const [getInstancePrev, setInstancePrev] = useState();
     const [isLoading, setIsLoading] = useState(false)
+    const [isIndex, setIndex] = useState('')
     const [getLoadingStake, setLoadingStake] = useState('')
 
     useEffect(() => {
@@ -33,41 +35,53 @@ const StakingList = () => {
         })()
     }, [networkDetails]);
 
-    useEffect(() => {
-        (async () => {
-            if(networkDetails.address && getInstancePrev) {
-                const result = await poolMethods.AllStakes(getInstancePrev, networkDetails.address)
-                if(result) {
-                    Promise.all(result.map(async r => {
-                        const res = await poolMethods.getStakes(getInstancePrev, networkDetails.address, r )
-                        let newdate = formattedDate(res[2]);
-                        let calculateDate = newdate.setDate(newdate.getDate() + 30)
-                        let current = formattedDate(Date.parse(new Date()))
-                        console.log('Date.parse(new Date())', Date.parse(new Date()))
-                        console.log('current', current)
-                        const obj = {stakeId: res[0], amount: res[1], timestamp: calculateDate, date: newdate, currentTimestamp: current}
-                        return obj
-                    })).then(values => {
-                        setUserData(values)
-                    });
-                }
-            } else {
-                setUserData([])
+    const onHandleStake = async () => {
+        if(networkDetails.address && getInstancePrev) {
+            const result = await poolMethods.AllStakes(getInstancePrev, networkDetails.address)
+            if(result) {
+                // const stakeResult = await getAllStake(networkDetails.address)
+                Promise.all(result.map(async (r, i) => {
+                    const res = await poolMethods.getStakes(getInstancePrev, networkDetails.address, r)
+                    const iswhitelisted = await poolMethods.iswhitelisted(getInstancePrev, networkDetails.address, res[0])
+                    // const iswhitelisted = await poolMethods.iswhitelisted(getInstancePrev, networkDetails.address, res[0])
+                    // const stakeObj = stakeResult.data.responseData.find(re => re.stakeId === res[0])
+                    let newdate = formattedDate(res[2]);
+                    let date = formattedDate(res[2])
+                    // const timeStamp = new Date(date.setDate(date.getDate() + 30));
+                    const timeStamp = new Date(date.getTime() + 3   *60000)
+                    const isUnstake = res[5]
+                    console.log(i, 'isUnstake', isUnstake, 'iswhitelisted', iswhitelisted, !iswhitelisted && !isUnstake)
+                    const obj = {stakeId: res[0], isUnstake, iswhitelisted, amount: res[1], timestamp: Date.parse(timeStamp), date: newdate, currentTimestamp: Date.parse(new Date())}
+                    return obj
+                })).then(values => {
+                    setIsLoading(false)
+                    setUserData(values)
+                });
             }
-        })()
+        } else {
+            setIsLoading(false)
+            setUserData([])
+        }
+    }
+
+    useEffect(() => {
+        onHandleStake()
     }, [getInstancePrev, networkDetails])
 
-    const onClickToStackPay = async (id, amount, stakeId) => {
+    const onClickToStackPay = async (index, id, amount, stakeId) => {
         if (networkDetails.address !== '') {
             setLoadingStake('unstake')
             setIsLoading(true)
+            setIndex(index)
             try {
                 const result = await poolMethods.unstack(getInstancePrev, networkDetails.address, amount, stakeId)
                 if (result) {
+                    onHandleStake()
+                    setIndex('')
                     setLoadingStake('')
-                    setIsLoading(false)
                 }
             } catch (err) {
+                setIndex('')
                 setLoadingStake('')
                 setIsLoading(false)
             }
@@ -76,17 +90,20 @@ const StakingList = () => {
         }
     }
 
-    const onClickToVerify = async (id, stakeId) => {
+    const onClickToVerify = async (index, id, stakeId) => {
         if (networkDetails.address !== '') {
             setLoadingStake('verify')
             setIsLoading(true)
+            setIndex(index)
             try {
                 const result = await poolMethods.whiteListed(getInstancePrev, networkDetails.address, stakeId)
                 if (result) {
+                    onHandleStake()
+                    setIndex('')
                     setLoadingStake('')
-                    setIsLoading(false)
                 }
             } catch (err) {
+                setIndex('')
                 setLoadingStake('')
                 setIsLoading(false)
             }
@@ -113,10 +130,17 @@ const StakingList = () => {
                             <td>{res.amount}</td>
                             <td>{dateFormate(res.date)}</td>
                             <td>
-                                {console.log('res.timestamp <= res.currentTimestamp', res.timestamp <= res.currentTimestamp)}
-                                {getLoadingStake !== 'verify' && <button className="btn-stake btn" disabled={res.timestamp <= res.currentTimestamp} onClick={() => onClickToVerify(res._id, res.stackId)}><span className="px-4">Verify</span></button>}
-                                {isLoading && <button className="btn-stake btn">Loading...</button>}
-                                {getLoadingStake !== 'unstake' && <button className="btn-stake btn" disabled={res.timestamp <= res.currentTimestamp} onClick={() => onClickToStackPay(res._id, res.amount, res.stackId)}><span className="px-4">Unstake</span></button>}
+                                {/* {console.log('res.currentTimestamp >= res.timestamp && !res.iswhitelisted', ind, res.currentTimestamp >= res.timestamp, res.iswhitelisted)} */}
+                                {isIndex!==ind && <button className="btn-stake btn" disabled={res.currentTimestamp < res.timestamp} onClick={() => onClickToVerify(ind, res._id, res.stakeId)}><span className="px-4">Verify</span></button>}
+                                {isIndex===ind && getLoadingStake!=='verify' && <button className="btn-stake btn" disabled={res.currentTimestamp < res.timestamp} onClick={() => onClickToVerify(ind, res._id, res.stakeId)}><span className="px-4">Verify</span></button>}
+                                {/* {isIndex!==ind && <button className="btn-stake btn" disabled={res.timestamp <= res.currentTimestamp} onClick={() => onClickToVerify(ind, res._id, res.stakeId)}><span className="px-4">Verify</span></button>} */}
+                                {isLoading && isIndex===ind && <button className="btn-stake btn">Loading...</button>}
+                                {isIndex===ind && getLoadingStake!=='unstake' && res.currentTimestamp < res.timestamp && !res.iswhitelisted && <button className="btn-stake btn" disabled={true} onClick={() => onClickToStackPay(ind, res._id, res.amount, res.stakeId)}><span className="px-4">Unstake</span></button>}
+                                {isIndex!==ind && res.currentTimestamp < res.timestamp && !res.iswhitelisted && <button className="btn-stake btn" disabled={true} onClick={() => onClickToStackPay(ind, res._id, res.amount, res.stakeId)}><span className="px-4">Unstake</span></button>}
+                                {isIndex===ind && getLoadingStake!=='unstake' && res.currentTimestamp < res.timestamp && res.iswhitelisted && <button className="btn-stake btn" disabled={res.isUnstake} onClick={() => onClickToStackPay(ind, res._id, res.amount, res.stakeId)}><span className="px-4">Unstake</span></button>}
+                                {isIndex!==ind && res.currentTimestamp < res.timestamp && res.iswhitelisted && <button className="btn-stake btn" disabled={!res.isUnstake} onClick={() => onClickToStackPay(ind, res._id, res.amount, res.stakeId)}><span className="px-4">Unstake</span></button>}
+                                {isIndex===ind && getLoadingStake!=='unstake' && res.currentTimestamp >= res.timestamp && <button className="btn-stake btn" disabled={true} onClick={() => onClickToStackPay(ind, res._id, res.amount, res.stakeId)}><span className="px-4">Unstake</span></button>}
+                                {isIndex!==ind && res.currentTimestamp >= res.timestamp && <button className="btn-stake btn" disabled={true} onClick={() => onClickToStackPay(ind, res._id, res.amount, res.stakeId)}><span className="px-4">Unstake</span></button>}
                             </td>
                         </tr>
                     )
