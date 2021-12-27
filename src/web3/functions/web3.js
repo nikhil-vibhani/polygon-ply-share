@@ -33,7 +33,7 @@ const loadBlockChainData = async (
         const wallet = "metamask";
 
         // listen the Chain ID
-        const chainId = await window.ethereum.chainId;
+        const chainId = '137';
         const chainData = chainId ? getChainData(chainId) : null;
         if (chainData && chainData.isChainValid) {
             // Load Account

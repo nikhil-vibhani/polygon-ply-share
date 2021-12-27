@@ -5,8 +5,13 @@ export function ellipseAddress(address) {
 }
 
 export function getChainData(chainId) {
+  console.log('supportedChains', supportedChains)
   const chainData = supportedChains.filter(
-    (chain) => chain.chain_id === chainId
+    (chain) => {
+      console.log('chain.chain_id', chain.chain_id)
+      console.log('chainId', chainId)
+      return chain.chain_id === chainId
+    }
   )[0];
 
   if (!chainData) {

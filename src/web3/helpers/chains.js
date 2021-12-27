@@ -10,6 +10,16 @@ const supportedChains = [
       network_id: 97,
     },
     {
+      name: "Polygon-Mainnet",
+      chain_id: "137",
+      network_id: 137,
+    },
+    {
+      name: "Mumbai Testne",
+      chain_id: "80001",
+      network_id: 80001,
+    },
+    {
         name: "ETH-mainnet",
         chain_id: "0x1",
         network_id: 1,

@@ -196,6 +196,7 @@ function getBackedBalance(ercInstance, walletAddress, stakeId) {
                 .balanceOf(walletAddress)
                 .call({ from: walletAddress }, (err, data) => {
                     if (err) {
+                        
                         reject({ error: err});
                     } else {
                         resolve(data/enviornment.divideValue)
