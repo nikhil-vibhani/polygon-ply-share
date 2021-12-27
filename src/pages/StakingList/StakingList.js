@@ -47,10 +47,10 @@ const StakingList = () => {
                     // const stakeObj = stakeResult.data.responseData.find(re => re.stakeId === res[0])
                     let newdate = formattedDate(res[2]);
                     let date = formattedDate(res[2])
-                    // const timeStamp = new Date(date.setDate(date.getDate() + 30));
-                    const timeStamp = new Date(date.getTime() + 3   *60000)
+                    const timeStamp = new Date(date.setDate(date.getDate() + 30));
+                    // const timeStamp = new Date(date.getTime() + 3   *60000)
                     const isUnstake = res[5]
-                    console.log(i, 'isUnstake', isUnstake, 'iswhitelisted', iswhitelisted, !iswhitelisted && !isUnstake)
+                    // console.log(i, 'isUnstake', isUnstake, 'iswhitelisted', iswhitelisted, !iswhitelisted && !isUnstake)
                     const obj = {stakeId: res[0], isUnstake, iswhitelisted, amount: res[1], timestamp: Date.parse(timeStamp), date: newdate, currentTimestamp: Date.parse(new Date())}
                     return obj
                 })).then(values => {
